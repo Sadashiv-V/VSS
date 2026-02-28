@@ -1,3 +1,5 @@
+
+
 #include<iostream>
 #include<string>
 #include<vector>
@@ -23,71 +25,106 @@ class user{
 
     void deposit(int**a){
      int p, m;
-     cout<<"Enter the Amount:";
-     cin>>m;
-     cout<<"Enter the Password:";
+          int c=0;
+     while(c<3){
+    cout<<"Enter the Password:";
      cin>>p;
      if(p!=pass){
         cout<<"Wrong password!!"<<endl;
-        return;
+        c++;
      }
-   else{
+     else {
+      break;
+     }
+     if(c==3){
+      return;
+     }
+     }
+     cout<<"Enter the Amount:";
+     cin>>m;
       bal+=m;
       **a+=m;
       cout<<"Name:"<<name<<endl;
       cout<<"ID:"<<id<<endl;
      cout<<"Amount Deposited"<<endl;
      return;
-   }
+   
 }
 
 void check(){
     int p;
-    cout<<"Enter the password:";
-    cin>>p;
-    if(p!=pass){
+       int c=0;
+     while(c<3){
+    cout<<"Enter the Password:";
+     cin>>p;
+     if(p!=pass){
         cout<<"Wrong password!!"<<endl;
-        return;
-    }
-    else{
+        c++;
+     }
+     else {
+      break;
+     }
+     if(c==3){
+      return;
+     }
+     }
       cout<<"Name:"<<name<<endl;
       cout<<"ID:"<<id<<endl;
-        cout<<"Your Balance:"<<bal<<endl;
-    }
+        cout<<"Your Balance:"<<bal<<endl;  
     return;
 }
 
 void withdraw(int**a){
         int p, m;
-     cout<<"Enter the Amount:";
-     cin>>m;
-     cout<<"Enter the Password:";
+               int c=0;
+     while(c<3){
+    cout<<"Enter the Password:";
      cin>>p;
-
      if(p!=pass){
         cout<<"Wrong password!!"<<endl;
-        return;
+        c++;
      }
-     else{
+     else {
+      break;
+     }
+     if(c==3){
+      return;
+     }
+     }
+     cout<<"Enter the Amount:";
+     cin>>m;
+     if(m>bal){
+      cout<<"No Enough Balance";
+      return;
+     }
      bal-=m;
      **a-=m;
      cout<<"Name:"<<name<<endl;
       cout<<"ID:"<<id<<endl;
      cout<<"Please collect cash"<<endl;
-     return;
-     }
+     return;     
 }
 
 void changepass(){
     int p,np;
       cout<<"Enter Your current Password:";
      cin>>p;
-
+       int c=0;
+     while(c<3){
+    cout<<"Enter the Password:";
+     cin>>p;
      if(p!=pass){
         cout<<"Wrong password!!"<<endl;
-        return;
+        c++;
      }
-     else{
+     else {
+      break;
+     }
+     if(c==3){
+      return;
+     }
+     }
+    
          cout<<"Enter New Password:";
      cin>>np; 
      if(np==p){
@@ -99,7 +136,7 @@ void changepass(){
       cout<<"Password updated succesfully"<<endl;
         return;
      }
-     }
+     
 }
     void deleteacc(int**a){
         *a-=bal;
@@ -199,47 +236,72 @@ return;
 
 void atmdep(int** a){
      int p, m,pass=141812;
-     cout<<endl<<"Enter the Amount:";
-     cin>>m;
-     cout<<"Enter the Password:";
+            int c=0;
+     while(c<3){
+    cout<<"Enter the Password:";
      cin>>p;
      if(p!=pass){
         cout<<"Wrong password!!"<<endl;
-        return;
+        c++;
      }
-   else{
+     else {
+      break;
+     }
+     if(c==3){
+      return;
+     }
+     }
+     cout<<endl<<"Enter the Amount:";
+     cin>>m;
       **a+=m;
      cout<<endl<<"Amount Deposited"<<endl;
-     return;  
-   }
+     return;     
 }
 
 void atmdraw(int** a){
      int p, m,pass=141812;
-     cout<<endl<<"Enter the Amount:";
-     cin>>m;
-     cout<<"Enter the Password:";
+               int c=0;
+     while(c<3){
+    cout<<"Enter the Password:";
      cin>>p;
      if(p!=pass){
         cout<<"Wrong password!!"<<endl;
-        return;
+        c++;
      }
-   else{
+     else {
+      break;
+     }
+     if(c==3){
+      return;
+     }
+     } 
+     cout<<endl<<"Enter the Amount:";
+     cin>>m;
+       if(m>**a){
+      cout<<"No Enough Balance";
+      return ;
+     }
+     cout<<"Enter the Password:";
+     cin>>p;
       **a-=m;
      cout<<endl<<"Take the Cash"<<endl;
      return;  
-   }
+   
+}
+void atmbal(int ** a){
+ cout<<endl<<endl<<"The remaining ATM balance is:"<<**a<<endl;
 }
 
 void atm(int *a){
 
 int s;
+while(1){
 cout<<endl<<"Select the option:"<<endl<<"1.Check Balance\n2.Deposit\n3.Withdraw\n4.EXIT\n";
  cout <<"Enter your option:";
     cin>>s;
    
         switch(s){
-        case 1: cout<<endl<<endl<<"The remaining ATM balance is:"<<*a<<endl;
+        case 1: atmbal(&a);
         break;
         case 2 :atmdep(&a) ;
         break;
@@ -247,6 +309,7 @@ cout<<endl<<"Select the option:"<<endl<<"1.Check Balance\n2.Deposit\n3.Withdraw\
         break;
         case 4: return;
     }
+}
     return;
 }
 
@@ -257,10 +320,12 @@ vector<user>u;
 vector<int>c;
 cout<<"Welcome to SBI"<<endl;
     while(1){
-    cout<<"Select the option:"<<endl<<"1.New user\n2.Deposit\n3.Withdraw\n4.Check Balance\n5.Change Password\n6.Delete account\n7.EXIT\n";
+    cout<<"+================================================================================================================================================+";
+    cout<<endl<<"Select any one option:"<<endl<<"1.New user\n2.Deposit\n3.Withdraw\n4.Check Balance\n5.Change Password\n6.Delete account\n7.EXIT\nX.IF ADMIN ENTER SECRET CODE\n";
+    cout<<"+================================================================================================================================================+";
     cout <<endl<<endl<<"Enter your option:";
     cin>>s;
-
+    cout<<"+================================================================================================================================================+";
     switch(s){
         case 1:adduser(u,c);
         break;
