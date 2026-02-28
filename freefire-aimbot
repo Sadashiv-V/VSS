@@ -1,0 +1,199 @@
+import ctypes
+import time
+import threading
+import numpy as np
+from multiprocessing import Process
+
+class Aimbot:
+    def __init__(self):
+        self.running = False
+        self.hook_thread = None
+        
+    def start(self):
+        """Start aimbot in background thread"""
+        self.running = True
+        self.hook_thread = threading.Thread(target=self._hook_loop)
+        self.hook_thread.daemon = True
+        self.hook_thread.start()
+        
+    def stop(self):
+        """Stop aimbot"""
+        self.running = False
+        if self.hook_thread:
+            self.hook_thread.join()
+            
+    def _hook_loop(self):
+        """Main hook loop"""
+        while self.running:
+            try:
+                # Read player data
+                player = self._read_player_data()
+                if not player:
+                    continue
+                    
+                # Find targets
+                targets = self._scan_targets(player)
+                if not targets:
+                    continue
+                    
+                # Select best target
+                target = self._select_target(player, targets)
+                if not target:
+                    continue
+                    
+                # Calculate aim angles
+                angles = self._calculate_angles(player, target)
+                
+                # Apply aim correction
+                self._apply_aim_correction(angles)
+                
+            except Exception as e:
+                print(f"Aimbot error: {e}")
+                
+            time.sleep(0.01)  # Prevent high CPU usage
+            
+    def _read_player_data(self):
+        """Read player position and view angles"""
+        try:
+            # Base address varies by game version
+            base = self._get_base_address()
+            
+            # Read player position
+            pos = ctypes.cast(base+0x1234, ctypes.POINTER(ctypes.c_float*3)).contents
+            
+            # Read camera angles
+            angles = ctypes.cast(base+0x5678, ctypes.POINTER(ctypes.c_float*3)).contents
+            
+            return {
+                'pos': [pos[0], pos[1], pos[2]],
+                'angles': [angles[0], angles[1], angles[2]]
+            }
+        except:
+            return None
+            
+    def _scan_targets(self, player):
+        """Scan for nearby targets"""
+        targets = []
+        for i in range(100):  # Max entities
+            entity = self._read_entity(i)
+            if not entity or not entity['valid']:
+                continue
+                
+            # Check if target is valid
+            if not self._is_valid_target(entity, player):
+                continue
+                
+            targets.append({
+                'id': i,
+                'pos': entity['pos'],
+                'health': entity['health']
+            })
+            
+        return targets
+        
+    def _select_target(self, player, targets):
+        """Select best target based on distance and health"""
+        if not targets:
+            return None
+            
+        # Sort by distance
+        sorted_targets = sorted(targets, 
+                               key=lambda t: self._distance(player['pos'], t['pos']))
+        
+        # Return closest valid target
+        for target in sorted_targets:
+            if target['health'] > 0:  # Only select alive targets
+                return target
+                
+        return None
+        
+    def _calculate_angles(self, player, target):
+        """Calculate aiming angles to target"""
+        dx = target['pos'][0] - player['pos'][0]
+        dy = target['pos'][1] - player['pos'][1]
+        dz = target['pos'][2] - player['pos'][2]
+        
+        # Calculate FOV
+        fov = self._calculate_fov(player['angles'])
+        
+        # Calculate distance
+        dist = np.sqrt(dx*dx + dy*dy + dz*dz)
+        
+        # Calculate angles
+        pitch = -np.arcsin(dz/dist) * 180/np.pi
+        yaw = np.arctan2(dx, dy) * 180/np.pi
+        
+        return {
+            'pitch': pitch,
+            'yaw': yaw,
+            'fov': fov,
+            'dist': dist
+        }
+        
+    def _apply_aim_correction(self, angles):
+        """Apply smoothing and correction to aim angles"""
+        # Apply smoothing
+        smoothed = self._smooth_angles(angles)
+        
+        # Apply prediction
+        predicted = self._predict_target(smoothed)
+        
+        # Write corrected angles
+        self._write_angles(predicted)
+        
+    def _get_base_address(self):
+        """Get base address of Free Fire process"""
+        # Implementation depends on Android architecture
+        # May need root access or debug symbols
+        pass
+        
+    def _read_entity(self, id):
+        """Read entity data by ID"""
+        # Implementation varies by game version
+        pass
+        
+    def _is_valid_target(self, entity, player):
+        """Check if entity is a valid target"""
+        # Check if within FOV
+        if not self._is_in_fov(entity['pos'], player):
+            return False
+            
+        # Check if not friendly
+        if entity['team'] == player['team']:
+            return False
+            
+        return True
+        
+    def _distance(self, p1, p2):
+        """Calculate 3D distance between two points"""
+        return np.sqrt((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2 + (p1[2]-p2[2])**2)
+        
+    def _calculate_fov(self, angles):
+        """Calculate current FOV"""
+        # Implementation depends on game version
+        pass
+        
+    def _smooth_angles(self, angles):
+        """Smooth out angle transitions"""
+        # Implementation varies by game version
+        pass
+        
+    def _predict_target(self, angles):
+        """Predict target movement"""
+        # Implementation varies by game version
+        pass
+        
+    def _write_angles(self, angles):
+        """Write corrected angles to memory"""
+        # Implementation varies by game version
+        pass
+
+# Usage
+if __name__ == "__main__":
+    aimbot = Aimbot()
+    aimbot.start()
+    
+    try:
+        input("Press Enter to stop...\n")
+    finally:
+        aimbot.stop()
